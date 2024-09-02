@@ -1,4 +1,4 @@
-package diego.backend.finterra.finterra_test.configs;
+package diego.backend.finterra.finterra_test.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +9,20 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import diego.backend.finterra.finterra_test.exceptions.customs.CustomAuthenticationEntryPoint;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+  public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+    this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+  }
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -21,9 +30,10 @@ public class SecurityConfig {
         (requests) -> requests
             .requestMatchers(HttpMethod.GET, "/api/prueba/no-authorized").authenticated()
             .requestMatchers(HttpMethod.GET, "/api/prueba/authorized").permitAll()
-            .anyRequest().authenticated()
-            )
+            .anyRequest().authenticated())
         .httpBasic(withDefaults())
+        .exceptionHandling(
+            exceptionHandling -> exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint))
         .build();
   }
 
@@ -36,4 +46,5 @@ public class SecurityConfig {
         .build());
     return manager;
   }
+
 }
