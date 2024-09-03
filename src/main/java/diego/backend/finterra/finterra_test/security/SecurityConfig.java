@@ -39,10 +39,8 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(
         (requests) -> requests
-            // .requestMatchers(HttpMethod.GET, AUTHORIZED_URLS).permitAll()
-            // .requestMatchers(HttpMethod.POST, AUTHORIZED_URLS).permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/prueba/no-authorized").authenticated()
-            .anyRequest().permitAll())
+            .requestMatchers(HttpMethod.GET, AUTHORIZED_URLS).permitAll()
+            .anyRequest().authenticated())
         .httpBasic(withDefaults())
         .exceptionHandling(
             exceptionHandling -> exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint))

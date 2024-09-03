@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import diego.backend.finterra.finterra_test.controllers.abstracts.ResponseApi;
 import diego.backend.finterra.finterra_test.dtos.ResponseDto;
 import diego.backend.finterra.finterra_test.servicies.PokemonService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Pokemon")
 @RestController
 @RequestMapping("pokemons")
+@SecurityRequirement(name = "basicAuth")
 public class PokemonRestController extends ResponseApi {
     @Autowired
     private PokemonService pokemonService;
