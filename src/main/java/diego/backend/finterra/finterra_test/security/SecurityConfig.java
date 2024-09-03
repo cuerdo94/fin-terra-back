@@ -22,15 +22,27 @@ public class SecurityConfig {
 
   public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
     this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+
   }
+
+  public static final String API = "/api/";
+
+  public static final String[] AUTHORIZED_URLS = {
+      API + "prueba/authorized",
+      "/swagger-ui/**",
+      "/v3/api-docs/",
+      "/swagger-ui/index.html",
+      API + "v3/api-docs/**"
+  };
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(
         (requests) -> requests
+            // .requestMatchers(HttpMethod.GET, AUTHORIZED_URLS).permitAll()
+            // .requestMatchers(HttpMethod.POST, AUTHORIZED_URLS).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/prueba/no-authorized").authenticated()
-            .requestMatchers(HttpMethod.GET, "/api/prueba/authorized").permitAll()
-            .anyRequest().authenticated())
+            .anyRequest().permitAll())
         .httpBasic(withDefaults())
         .exceptionHandling(
             exceptionHandling -> exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint))
