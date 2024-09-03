@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import diego.backend.finterra.finterra_test.exceptions.customs.CustomException;
 import diego.backend.finterra.finterra_test.models.MoveResponse;
+import diego.backend.finterra.finterra_test.models.PokemonPaginationResponse;
 import diego.backend.finterra.finterra_test.models.PokemonResponse;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,15 @@ public class PokemonRepository {
         .retrieve()
         .bodyToMono(MoveResponse.class).onErrorResume(WebClientResponseException.class, e -> {
           return Mono.error(new CustomException(404, "No se encontro " + nameOrId, null));
+        });
+  }
+
+  public Mono<PokemonPaginationResponse> getPokemonsByGeneration(int generation) {
+    return webClient.get()
+        .uri("/generation/{generation}", generation)
+        .retrieve()
+        .bodyToMono(PokemonPaginationResponse.class).onErrorResume(WebClientResponseException.class, e -> {
+          return Mono.error(new CustomException(404, "No se encontro " + generation, null));
         });
   }
 }

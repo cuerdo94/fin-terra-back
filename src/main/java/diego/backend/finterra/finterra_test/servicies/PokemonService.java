@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import diego.backend.finterra.finterra_test.dtos.MoveDto;
 import diego.backend.finterra.finterra_test.dtos.PokemonDto;
 import diego.backend.finterra.finterra_test.models.MoveResponse;
+import diego.backend.finterra.finterra_test.models.PaginatedResponse;
+import diego.backend.finterra.finterra_test.models.PokemonPaginationResponse;
 import diego.backend.finterra.finterra_test.models.PokemonResponse;
 import diego.backend.finterra.finterra_test.models.PokemonResponse.MoveWrapper;
 import diego.backend.finterra.finterra_test.repositories.PokemonRepository;
@@ -69,4 +71,31 @@ public class PokemonService {
     moveDto.setPower(data.getPower());
     return moveDto;
   }
+
+  public PaginatedResponse<PokemonPaginationResponse.PokemonDetailPaginationResponse> getPokemonsByGeneration(
+      int generation, int page, int limit) {
+
+    PokemonPaginationResponse data = pokemonRepository.getPokemonsByGeneration(generation).block();
+    int currentPage = (page <= 1 ? 1 : page);
+    int offset = limit * (currentPage - 1);
+    int totalElements = data.getPokemonSpecies().size();
+    int totalPages = (int) Math.ceil((double) totalElements / limit);
+
+    List<PokemonPaginationResponse.PokemonDetailPaginationResponse> paginatedList = data.getPokemonSpecies().stream()
+        .skip(offset)
+        .limit(limit)
+        .collect(Collectors.toList());
+
+    PaginatedResponse<PokemonPaginationResponse.PokemonDetailPaginationResponse> paginatedResponse = new PaginatedResponse<>();
+    paginatedResponse.setContent(paginatedList);
+    paginatedResponse.setTotalElements(totalElements);
+    paginatedResponse.setTotalPages(totalPages);
+    paginatedResponse.setCurrentPage(currentPage);
+    paginatedResponse.setPageSize(limit);
+    paginatedResponse.setCurrentTotal(paginatedList.size());
+
+    return paginatedResponse;
+
+  }
+
 }
